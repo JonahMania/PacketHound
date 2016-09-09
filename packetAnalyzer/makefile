@@ -1,4 +1,7 @@
-PAC_CAP_SRC = src/pacCap.c
+PAC_CAP_SRC = src/pacCap.c \
+	src/pacCap.h \
+	src/handlePacket.c \
+	src/handlePacket.h
 RM = rm -f
 CFLAGS = -g -lpcap
 

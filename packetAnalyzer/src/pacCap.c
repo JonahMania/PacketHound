@@ -1,14 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <pcap.h>
-#include <time.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <signal.h>
+#include "pacCap.h"
 
 #define OPTS "df:i:l:n:o:r:t:"
 
@@ -28,32 +18,7 @@ void printHelp()
     printf("  -t        time in minuites before the program will close default is infinity\n");
 }
 
-void caught_packet( u_char *user_args, const struct pcap_pkthdr *cap_header, const u_char *packet )
-{
-    char header[64];
-    time_t t;
-    struct tm *ltime;
 
-    t = time(NULL);
-    ltime = localtime( &t );
-
-    printf( "Captured a packet of size %d bytes\n", cap_header->len );
-
-    // if( fwrite( ltime, sizeof( struct tm ), 1, file ) < 1 )
-    // {
-    //     perror( "fwrite" );
-    // }
-    //
-    // if( fwrite( cap_header, sizeof( struct pcap_pkthdr ), 1, file ) < 1 )
-    // {
-    //     perror( "fwrite" );
-    // }
-    //
-    // if( fwrite( packet, cap_header->len, 1, file ) < 1 )
-    // {
-    //     perror( "fwrite" );
-    // }
-}
 
 //Method that runs when ctrl+c is pressed
 void signalHandler( int x )
@@ -155,7 +120,7 @@ int main( int argc, char **argv )
         }
     }
 
-    pcap_loop( pcap_handle, -1, caught_packet, NULL );
+    pcap_loop( pcap_handle, -1, handlePacket, NULL );
 
     pcap_close( pcap_handle );
 
