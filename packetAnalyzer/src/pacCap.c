@@ -6,9 +6,9 @@
 pcap_t *pcap_handle;
 
 //Method to print help message
-void printHelp()
+void printHelp( char* path )
 {
-    printf("Usage: theHound [OPTION]\n");
+    printf("Usage: %s [OPTION]\n", path );
     printf("The hound will sniff out and store packets on a specific device\n");
     printf("\n");
     printf("  -d        demonize\n");
@@ -52,7 +52,7 @@ int main( int argc, char **argv )
     //Print a help message if one is requested
     if( argv[1] && strcmp( argv[1], "--help" ) == 0 )
     {
-        printHelp();
+        printHelp(argv[0]);
         return 0;
     }
     //Process command line arguments

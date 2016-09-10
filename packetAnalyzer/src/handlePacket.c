@@ -2,27 +2,22 @@
 
 void handlePacket( u_char *user_args, const struct pcap_pkthdr *cap_header, const u_char *packet )
 {
-    char header[64];
-    time_t t;
-    struct tm *ltime;
+    //Ethernet header
+    const struct etherHeader *ethr;
+    //IP header
+    const struct ipHeader *ip;
+    //Get time of capture
+    struct timeval tv;
+    gettimeofday( &tv, NULL );
+    unsigned long long timeSinceEpoch = (unsigned long long)(tv.tv_sec) * 1000 +
+        (unsigned long long)(tv.tv_usec) / 1000;
 
-    t = time(NULL);
-    ltime = localtime( &t );
+    ethr = (const struct etherHeader *)packet;
+    ip = (const struct ipHeader *)(packet+ETHER_HDR_LEN);
 
+    printf("%llu\n",timeSinceEpoch);
+    printf( "Source: %s ", inet_ntoa( *(struct in_addr*)&(ip->ip_src_addr) ) );
+    printf( "Dest: %s \n", inet_ntoa( *(struct in_addr*)&(ip->ip_dest_addr) ) );
     printf( "Captured a packet of size %d bytes\n", cap_header->len );
 
-    // if( fwrite( ltime, sizeof( struct tm ), 1, file ) < 1 )
-    // {
-    //     perror( "fwrite" );
-    // }
-    //
-    // if( fwrite( cap_header, sizeof( struct pcap_pkthdr ), 1, file ) < 1 )
-    // {
-    //     perror( "fwrite" );
-    // }
-    //
-    // if( fwrite( packet, cap_header->len, 1, file ) < 1 )
-    // {
-    //     perror( "fwrite" );
-    // }
 }
