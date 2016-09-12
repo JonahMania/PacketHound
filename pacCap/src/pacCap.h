@@ -12,9 +12,11 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <signal.h>
-#include <gdbm.h>
+#include <node.h>
+#include <pthread.h>
+#include <nan.h>
 
 //External code
-#include "handlePacket.h"
+#include "headers/setHeaders.h"
 
 #endif

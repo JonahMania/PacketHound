@@ -1,3 +1,4 @@
-packetAnalyzer/pacCap
-packetAnalyzer/src/dump/
-packetAnalyzer/src/utils/
+pacCap/src/utils/
+pacCap/build/
+pacCap/node_modules/
+pacCap/test.js

@@ -1,0 +1,14 @@
+{
+    "name": "paccap",
+    "version": "1.0.0",
+    "description": "",
+    "main": "build/Release/pacCap.node",
+    "scripts": {
+        "test": "test.js",
+        "install": "node-gyp build"
+    },
+    "gypfile": true,
+    "dependencies": {
+        "nan": "^2.4.0"
+    }
+}
