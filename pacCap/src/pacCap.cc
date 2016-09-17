@@ -1,38 +1,152 @@
 #include "pacCap.h"
 
+#define BUFFER_SIZE 1024
+
 //Global handler
 pcap_t *pcap_handle;
 //Global error buffer
 char errbuf[PCAP_ERRBUF_SIZE];
 
-/*
-* The callback for pcap_loop
-* @param {u_char*} args The user supplied arguments to the callback
-* @param {const struct pcap_pkthdr*} cap_header The pcap header for the packet
-* @param {cost u_char*} packet The raw packet data
-*/
-void handlePacket( u_char *args, const struct pcap_pkthdr *cap_header, const u_char *packet )
-{
-    //The time that the packet was captured in a unix timestamp
-    uint32_t timeSinceEpoch;
-    //Number of arguments in the callback
-    const unsigned argc = 1;
+struct Packet{
+    const struct pcap_pkthdr *h;
+    const u_char *p;
+};
 
-    //Create a new object
-    v8::Local<v8::Object> obj = Nan::New<v8::Object>();
-    //Get time of capture
-    timeSinceEpoch = cap_header->ts.tv_sec;
-    //Set the tumestamp in the object
-    Nan::Set(obj,Nan::New("timestamp").ToLocalChecked(),Nan::New(timeSinceEpoch));
-    //Set the packet size in bytes to the object
-    Nan::Set(obj,Nan::New("size").ToLocalChecked(),Nan::New(cap_header->len));
-    //Set all the headers from the packet
-    setHeaders( &obj, packet );
-    //Create return arguments
-    v8::Local<v8::Value> argv[argc] = { obj };
-    //Call the callback function
-    ((Nan::Callback*)args)->Call(argc, argv);
+//Flag to stop worker thread
+bool runWorker = true;
+//Buffer to hold current packets
+struct Packet buffer[BUFFER_SIZE];
+//Current index of the buffer
+int bufferIndex = 0;
+//Semaphore for mutex
+sem_t sem;
+
+void HandlePacket( u_char *args, const struct pcap_pkthdr *cap_header, const u_char *packet )
+{
+    sem_wait(&sem);
+    //CRITICAL REGION
+    printf("Setting packet %d\n",bufferIndex);
+    if( bufferIndex < BUFFER_SIZE )
+    {
+        printf("CALLBACK SIZE: %d\n", cap_header->len);
+        buffer[bufferIndex].h = (const struct pcap_pkthdr*)malloc(sizeof(const struct pcap_pkthdr));
+        memcpy((void*)buffer[bufferIndex].h, cap_header, sizeof(const struct pcap_pkthdr));
+
+        buffer[bufferIndex].p = (const u_char *)malloc( cap_header->len );
+        memcpy((void*)buffer[bufferIndex].p, packet, cap_header->len);
+
+        bufferIndex++;
+    }
+    sem_post(&sem);
 }
+
+static void *startRoutine(void *args)
+{
+    pcap_loop( pcap_handle, -1, HandlePacket, NULL );
+    pcap_close( pcap_handle );
+    pthread_exit(NULL);
+}
+
+class PcapWorker : public Nan::AsyncProgressWorkerBase<Packet>
+{
+    public:
+        PcapWorker(Nan::Callback *callback, Nan::Callback *progress): AsyncProgressWorkerBase(callback), progress(progress)
+        {
+        }
+        void Execute(const ExecutionProgress& progress)
+        {
+            pthread_t pid;
+            printf("running\n");
+
+            if( sem_init( &sem, 0, 1 ) == -1 )
+            {
+                //Error
+                // perror("sem");
+                //USE THROW HERE
+                return;
+            }
+
+            if( pthread_create(&pid, NULL, startRoutine, NULL) != 0 )
+            {
+                //Error
+                //USE THROW HERE
+                return;
+            }
+
+            while(runWorker){
+                //GATHER PACKETS AND FLUSH AND SEND TO JS
+
+                if( bufferIndex ){
+
+                    //((ExecutionProgress*)args)->Send(&p, sizeof(Packet) );
+                    progress.Signal();
+
+                }
+                sleep(1);
+
+            }
+
+            if( sem_destroy(&sem) == -1 )
+            {
+                //Error
+                //USE THROW HERE
+                return;
+            }
+        }
+
+        void HandleProgressCallback( const Packet* data, size_t size )
+        {
+
+            Nan::HandleScope scope;
+            v8::Local<v8::Array> response = Nan::New<v8::Array>();
+            //The time that the packet was captured in a unix timestamp
+            uint32_t timeSinceEpoch;
+            //Number of arguments in the callback
+            const unsigned argc = 1;
+
+            sem_wait(&sem);
+            //CRITICAL REGION
+            printf("Clearing buffer of size %d \n", bufferIndex );
+
+            for( int i = 0; i < bufferIndex; i++ )
+            {
+                // printf("packet %d size\n",buffer[i].h->len);
+                //Create a new object
+                v8::Local<v8::Object> obj = Nan::New<v8::Object>();
+                //Get time of capture
+                timeSinceEpoch = buffer[i].h->ts.tv_sec;
+                //Set the tumestamp in the object
+                Nan::Set(obj,Nan::New("timestamp").ToLocalChecked(),Nan::New(timeSinceEpoch));
+                //Set the packet size in bytes to the object
+                Nan::Set(obj,Nan::New("size").ToLocalChecked(),Nan::New(buffer[i].h->len));
+                //Set all the headers from the packet
+                setHeaders( &obj, buffer[i].p );
+                response->Set(i, obj );
+                //Free memory allocated with malloc
+                free( (void*)buffer[i].h );
+                free( (void*)buffer[i].p );
+
+            }
+            //Create return arguments
+            v8::Local<v8::Value> argv[argc] = { response };
+            progress->Call(argc, argv);
+            //Look into
+            // memset(buffer, 0, sizeof buffer);
+            bufferIndex = 0;
+            printf("IN CALLBACK\n");
+            sem_post(&sem);
+
+
+
+
+
+        }
+
+    private:
+
+        Nan::Callback *callback;
+        Nan::Callback *progress;
+};
 
 NAN_METHOD(start)
 {
@@ -100,8 +214,7 @@ NAN_METHOD(start)
         }
     }
 
-    pcap_loop( pcap_handle, -1, handlePacket, (u_char*)callback );
-    pcap_close( pcap_handle );
+    Nan::AsyncQueueWorker(new PcapWorker(callback,callback));
 
     info.GetReturnValue().Set(true);
 }
@@ -114,7 +227,10 @@ NAN_METHOD(getError)
 
 NAN_METHOD(close)
 {
-    pcap_breakloop( pcap_handle );
+    if( pcap_handle ){
+        pcap_breakloop( pcap_handle );
+    }
+    runWorker = false;
 }
 
 NAN_MODULE_INIT(Init)
