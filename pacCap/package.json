@@ -4,8 +4,8 @@
     "description": "",
     "main": "build/Release/pacCap.node",
     "scripts": {
-        "test": "test.js",
-        "install": "node-gyp build"
+        "test": "sudo node test.js",
+        "install": "HOME=~/.electron-gyp node-gyp rebuild --target=1.4.0 --arch=x64 --dist-url=https://atom.io/download/atom-shell"
     },
     "gypfile": true,
     "dependencies": {

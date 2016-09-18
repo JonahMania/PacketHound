@@ -3,3 +3,4 @@ pacCap/build/
 pacCap/node_modules/
 pacCap/test.js
 node_modules
+build/

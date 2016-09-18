@@ -1,14 +1,17 @@
 {
-    "name": "thehound",
-    "version": "1.0.0",
-    "description": "",
-    "main": "src/js/main.js",
-    "scripts": {
-        "start": "./node_modules/.bin/electron ."
-    },
-    "author": "Jonah Mania",
-    "license": "ISC",
-    "dependencies": {
-        "electron": "^1.4.0"
-    }
+  "name": "thehound",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/js/main.js",
+  "scripts": {
+    "start": "./node_modules/.bin/electron ."
+  },
+  "author": "Jonah Mania",
+  "license": "ISC",
+  "dependencies": {
+    "electron": "^1.4.0"
+  },
+  "devDependencies": {
+    "electron-rebuild": "^1.2.1"
+  }
 }
