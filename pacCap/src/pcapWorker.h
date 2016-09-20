@@ -43,6 +43,9 @@ class PcapWorker : public Nan::AsyncProgressWorkerBase<Packet>
         size_t length;
         Nan::Callback *callback;
         Nan::Callback *progress;
+
+    protected:
+        void HandleErrorCallback();
 };
 
 #endif

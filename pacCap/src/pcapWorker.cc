@@ -2,8 +2,6 @@
 
 //Flag to stop worker thread
 bool runWorker = true;
-//Global error buffer
-char errbuf[PCAP_ERRBUF_SIZE];
 //Global handler
 pcap_t *pcap_handle;
 //Buffer to hold current packets
@@ -12,6 +10,8 @@ struct Packet buffer[BUFFER_SIZE];
 int bufferIndex = 0;
 //Semaphore for mutex
 sem_t sem;
+//pcap error buffer
+char errbuf[PCAP_ERRBUF_SIZE];
 
 void HandlePacket( u_char *args, const struct pcap_pkthdr *cap_header, const u_char *packet )
 {
@@ -57,6 +57,7 @@ PcapWorker::~PcapWorker()
 
 void PcapWorker::Execute(const ExecutionProgress& progress)
 {
+
     //ID for the pcap thread
     pthread_t pid;
     //The device to capture packets on
@@ -72,7 +73,7 @@ void PcapWorker::Execute(const ExecutionProgress& progress)
     if( device == NULL )
     {
         //ERROR
-        // info.GetReturnValue().Set(false);
+        SetErrorMessage(errbuf);
         return;
     }
     //Attempt to hopen a pcap session
@@ -81,7 +82,7 @@ void PcapWorker::Execute(const ExecutionProgress& progress)
     if( pcap_handle == NULL )
     {
         //ERROR
-        // info.GetReturnValue().Set(false);
+        SetErrorMessage(errbuf);
         return;
     }
     //Check if there was filters passed to the worker
@@ -90,17 +91,16 @@ void PcapWorker::Execute(const ExecutionProgress& progress)
         //Compile the filter
         if( pcap_compile(pcap_handle, &filterProgram, this->filters, 0, net ) == -1 )
         {
-            // pcap_perror(pcap_handle,"HERE");
-            // Nan::ThrowError("Could no compile filter");
-            // info.GetReturnValue().Set(false);
+            //ERROR
+            SetErrorMessage(pcap_geterr(pcap_handle));
             return;
         }
 
         //Set the filter to the pcap handler
         if( pcap_setfilter( pcap_handle, &filterProgram ) == -1 )
         {
-            // Nan::ThrowError("Could not set filter");
-            // info.GetReturnValue().Set(false);
+            //Error
+            SetErrorMessage(pcap_geterr(pcap_handle));
             return;
         }
     };
@@ -108,17 +108,17 @@ void PcapWorker::Execute(const ExecutionProgress& progress)
     if( sem_init( &sem, 0, 1 ) == -1 )
     {
         //Error
-        // perror("sem");
-        //USE THROW HERE
+        SetErrorMessage("ERROR: sem_init");
         return;
     }
 
     if( pthread_create(&pid, NULL, startRoutine, NULL) != 0 )
     {
         //Error
-        //USE THROW HERE
+        SetErrorMessage("ERROR: pthread_create");
         return;
     }
+
     while(runWorker){
         if( bufferIndex )
         {
@@ -130,19 +130,20 @@ void PcapWorker::Execute(const ExecutionProgress& progress)
     if( sem_destroy(&sem) == -1 )
     {
         //Error
-        //USE THROW HERE
+        SetErrorMessage("ERROR: sem_destroy");
         return;
     }
 }
 
 void PcapWorker::HandleProgressCallback( const Packet* data, size_t size )
 {
+
     Nan::HandleScope scope;
     v8::Local<v8::Array> response = Nan::New<v8::Array>();
     //The time that the packet was captured in a unix timestamp
     uint32_t timeSinceEpoch;
     //Number of arguments in the callback
-    const unsigned argc = 1;
+    const unsigned argc = 2;
 
     sem_wait(&sem);
     //CRITICAL REGION
@@ -166,10 +167,21 @@ void PcapWorker::HandleProgressCallback( const Packet* data, size_t size )
 
     }
     //Create return arguments
-    v8::Local<v8::Value> argv[argc] = { response };
+    v8::Local<v8::Value> argv[argc] = { response, Nan::Null() };
+    // v8::Local<v8:String>
     progress->Call(argc, argv);
     //Look into
     bufferIndex = 0;
     sem_post(&sem);
+
+}
+
+void PcapWorker::HandleErrorCallback()
+{
+    Nan::HandleScope scope;
+    //Number of arguments in the callback
+    const unsigned argc = 2;
+    v8::Local<v8::Value> argv[argc] = { Nan::Null(), Nan::New<v8::String>(ErrorMessage()).ToLocalChecked() };
+    progress->Call(argc, argv);
 
 }

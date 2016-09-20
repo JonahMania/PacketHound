@@ -53,6 +53,7 @@ NAN_METHOD(close)
         pcap_breakloop( pcap_handle );
     }
     runWorker = false;
+    info.GetReturnValue().Set(true);
 }
 
 NAN_MODULE_INIT(Init)
