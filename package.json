@@ -9,7 +9,10 @@
   "author": "Jonah Mania",
   "license": "ISC",
   "dependencies": {
-    "electron": "^1.4.0"
+    "d3": "^4.2.2",
+    "electron": "^1.4.0",
+    "html-loader": "^0.4.3",
+    "webpack": "^1.13.2"
   },
   "devDependencies": {
     "electron-rebuild": "^1.2.1"

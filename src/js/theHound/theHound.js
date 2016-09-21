@@ -1,4 +1,4 @@
-var pacCap = require('../../pacCap/build/Release/pacCap');
+var pacCap = require("../../pacCap/build/Release/pacCap");
 
 function run(){
     pacCap.start(function(response, error){
@@ -8,13 +8,13 @@ function run(){
             console.log(error);
         }
     });
-    
+
     console.log("running");
     return true;
 }
 
 function close(){
     console.log("closing");
-    pacCap.close();
+    // pacCap.close();
     return true;
 }
