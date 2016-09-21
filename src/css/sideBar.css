@@ -1,0 +1,9 @@
+#sideBar{
+    width:20%;
+    height:100%;
+    float:left;
+}
+
+#sideBar > h1 {
+    color: black;
+}

@@ -1,5 +1,5 @@
 module.exports = {
-    entry:  './src/js/theHound/theHound.js',
+    entry:  './src/js/packetHound.js',
     output: {
         path: 'src/build',
         filename: 'bundle.js',
@@ -9,6 +9,7 @@ module.exports = {
     },
     module: {
         loaders: [
+
         ]
     }
 };
