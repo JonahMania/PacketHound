@@ -3,17 +3,16 @@
    src: url("../resources/fonts/JosefinSlab-Regular.ttf");
 }
 
-#sideBar{
-    font-family: JosefinSlab;
-    width:20%;
-    height:100%;
-    float:left;
-    background-color: #040D14;
-    text-align: center;
-    padding:0;
-}
-
 #sideBar > h1 {
     padding:6px;
     color: #FFFFFF;
+}
+
+#capContainer {
+    height: 20%;
+}
+
+#databaseInfoContainer {
+    height: 20%;
+    color:white;
 }

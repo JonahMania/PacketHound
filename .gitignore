@@ -5,3 +5,4 @@ pacCap/test.js
 node_modules
 build/
 src/build/
+databases/

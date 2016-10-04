@@ -12,3 +12,20 @@ body {
     height:100%;
     width:100%;
 }
+
+#sideBar{
+    font-family: JosefinSlab;
+    width:20%;
+    height:100%;
+    float:left;
+    background-color: #040D14;
+    text-align: center;
+    padding:0;
+}
+
+#vis {
+    float:right;
+    width:80%;
+    height: 100%;
+    padding:0;
+}
