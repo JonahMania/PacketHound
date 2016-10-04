@@ -1,6 +1,6 @@
 const db = require('electron').remote.require('../js/database/database').packets;
 /**
-* A function to insert a new packet into the database
+* Method to insert a new packet into the database
 * @param {array} packet An array of packets to insert into the database
 * @param {function} callback Function to run when count is calculated
 */
@@ -10,7 +10,7 @@ function insertPacket( packet, callback ){
     });
 }
 /**
-* A function to get the number of packets currently in the database
+* Method to get the number of packets currently in the database
 * @param {function} callback function to run when count is calculated
 */
 function getNumPackets( callback ){
