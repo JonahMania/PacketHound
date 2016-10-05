@@ -5,13 +5,13 @@ require("!style!css!../../css/sideBar.css");
 const capInfo = require("./capInfo");
 const databaseInfo = require("./databaseInfo");
 
+var capContainer;
+var databaseInfoContainer;
 
 /**
 * @param {object} domElement The element to render new html in
 */
 function build( domElement ){
-    var capContainer;
-    var databaseInfoContainer;
     //Write sideBar to dom
     domElement.innerHTML = sideBarHTML;
     capContainer = document.getElementById("capContainer");
@@ -21,5 +21,21 @@ function build( domElement ){
     //Load databaseInfo module
     databaseInfo.loadDatabaseInfo( databaseInfoContainer );
 }
+/**
+* Sets an onclick event to the capInfo box
+* @param {function} clickEvent Function to run when the capInfo box is clicked
+*/
+function setCapInfoOnclick( clickEvent ){
+    capContainer.onclick = clickEvent;
+}
+/**
+* Sets an onclick event to the databaseInfo box
+* @param {function} clickEvent Function to run when the databaseInfo box is clicked
+*/
+function setDatabaseInfoOnclick( clickEvent ){
+    databaseInfoContainer.onclick = clickEvent;
+}
 
 module.exports.build = build;
+module.exports.setCapInfoOnclick = setCapInfoOnclick;
+module.exports.setDatabaseInfoOnclick = setDatabaseInfoOnclick;

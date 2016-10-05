@@ -1,0 +1,13 @@
+#databaseVisContainer {
+    padding:20px;
+}
+
+.databaseVisPacket {
+    stroke:black;
+    stroke-width:2px;
+}
+
+
+.databaseVisPacketContainer {
+    fill:none;
+}

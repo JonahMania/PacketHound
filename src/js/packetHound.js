@@ -5,11 +5,13 @@ const pacCap = require("../../pacCap/build/Release/pacCap");
 //Page modules
 const sideBar = require("./sideBar/sideBar");
 const capture = require("./capture/capture");
+const databaseInterface = require("./databaseInterface/databaseInterface");
 //Database module
 const packetDatabase = require("./database/packetDatabase");
 //Add css styling
 require("!style!css!../css/main.css");
 var totalPackets;
+var currPage = "capture";
 var contentElement = document.getElementById("content");
 var sideBarElement = document.getElementById("sideBar");
 //Method to start capturing packets
@@ -44,7 +46,8 @@ function stopCap(){
 //Build sideBar
 sideBar.build(sideBarElement);
 //Build capture content
-capture.build(contentElement,startCap,stopCap);
+// capture.build(contentElement,startCap,stopCap);
+databaseInterface.build(contentElement);
 
 totalPackets = document.getElementById("totalPackets");
 packetDatabase.getNumPackets(function( err, count ){
@@ -55,6 +58,20 @@ packetDatabase.getNumPackets(function( err, count ){
     }
 });
 
+sideBar.setCapInfoOnclick(function(){
+    //Build capture content
+    if( currPage !== "capture"){
+        capture.build(contentElement,startCap,stopCap);
+        currPage = "capture";
+    }
+});
+
+sideBar.setDatabaseInfoOnclick(function(){
+    if( currPage !== "databaseInterface" ){
+        databaseInterface.build(contentElement);
+        currPage = "databaseInterface";
+    }
+});
 //Make sure that we close pcap when the user refreshes or leaves
 window.onbeforeunload = function (e) {
     console.log("pacCap: closing");

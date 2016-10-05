@@ -1,6 +1,6 @@
 const captureHTML = require("html-loader!../../html/capture/capture.html");
 /**
-* Method to build capture information for the main content section
+* Builds the capture module for the main content section
 * @param {object} domElement The element to render new html in
 * @param {function} startCap Method to start capturing
 * @param {function} stopCap Method to stop capturing

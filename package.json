@@ -11,7 +11,8 @@
   "dependencies": {
     "d3": "^4.2.2",
     "electron": "^1.4.0",
-    "nedb": "^1.8.0"
+    "nedb": "^1.8.0",
+    "textures": "^1.0.4"
   },
   "devDependencies": {
     "css-loader": "^0.25.0",
