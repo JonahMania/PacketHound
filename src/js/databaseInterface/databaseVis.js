@@ -6,7 +6,7 @@ const packetDatabase = require("../database/packetDatabase");
 */
 function drawPacket( domElement, size ){
 
-    var blockWidth = size / 2;
+    var blockWidth = size / 3;
     var blockHeight = 40;
     var padding = 2;
 
