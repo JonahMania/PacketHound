@@ -3,17 +3,19 @@
    src: url("../resources/fonts/JosefinSlab-Regular.ttf");
 }
 
-#sideBar > h1 {
-    padding:6px;
+#sideBar {
     color: #FFFFFF;
+
+}
+
+#sideBar h1 {
+    padding:6px;
 }
 
 #capContainer {
-    height: 20%;
-    color:white;
+    padding:6px;
 }
 
 #databaseInfoContainer {
-    height: 20%;
-    color:white;
+    padding:6px;
 }

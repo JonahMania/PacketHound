@@ -26,14 +26,20 @@ function build( domElement ){
 * @param {function} clickEvent Function to run when the capInfo box is clicked
 */
 function setCapInfoOnclick( clickEvent ){
-    capContainer.onclick = clickEvent;
+    capContainer.onclick = function(){
+        databaseInfo.collapse();
+        clickEvent();
+    }
 }
 /**
 * Sets an onclick event to the databaseInfo box
 * @param {function} clickEvent Function to run when the databaseInfo box is clicked
 */
 function setDatabaseInfoOnclick( clickEvent ){
-    databaseInfoContainer.onclick = clickEvent;
+    databaseInfoContainer.onclick = function(){
+        databaseInfo.expand();
+        clickEvent();
+    }
 }
 
 module.exports.build = build;

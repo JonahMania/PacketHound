@@ -11,7 +11,6 @@ const packetDatabase = require("./database/packetDatabase");
 //Add css styling
 require("!style!css!../css/main.css");
 var totalPackets;
-var currPage = "capture";
 var contentElement = document.getElementById("content");
 var sideBarElement = document.getElementById("sideBar");
 //Method to start capturing packets
@@ -60,17 +59,11 @@ packetDatabase.getNumPackets(function( err, count ){
 
 sideBar.setCapInfoOnclick(function(){
     //Build capture content
-    if( currPage !== "capture"){
-        capture.build(contentElement,startCap,stopCap);
-        currPage = "capture";
-    }
+    capture.build(contentElement,startCap,stopCap);
 });
 
 sideBar.setDatabaseInfoOnclick(function(){
-    if( currPage !== "databaseInterface" ){
-        databaseInterface.build(contentElement);
-        currPage = "databaseInterface";
-    }
+    databaseInterface.build(contentElement);
 });
 //Make sure that we close pcap when the user refreshes or leaves
 window.onbeforeunload = function (e) {
