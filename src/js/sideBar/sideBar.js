@@ -2,8 +2,6 @@
 var sideBarHTML = require("html-loader!../../html/sideBar/sideBar.html");
 //Add css styling
 require("!style!css!../../css/sideBar.css");
-const capInfo = require("./capInfo");
-const databaseInfo = require("./databaseInfo");
 
 var capContainer;
 var databaseInfoContainer;
@@ -16,10 +14,6 @@ function build( domElement ){
     domElement.innerHTML = sideBarHTML;
     capContainer = document.getElementById("capContainer");
     databaseInfoContainer = document.getElementById("databaseInfoContainer");
-    //Load startCap module
-    capInfo.loadStartCap( capContainer );
-    //Load databaseInfo module
-    databaseInfo.loadDatabaseInfo( databaseInfoContainer );
 }
 /**
 * Sets an onclick event to the capInfo box
@@ -27,7 +21,6 @@ function build( domElement ){
 */
 function setCapInfoOnclick( clickEvent ){
     capContainer.onclick = function(){
-        databaseInfo.collapse();
         clickEvent();
     }
 }
@@ -37,7 +30,6 @@ function setCapInfoOnclick( clickEvent ){
 */
 function setDatabaseInfoOnclick( clickEvent ){
     databaseInfoContainer.onclick = function(){
-        databaseInfo.expand();
         clickEvent();
     }
 }

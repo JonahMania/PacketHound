@@ -10,7 +10,6 @@ const databaseInterface = require("./databaseInterface/databaseInterface");
 const packetDatabase = require("./database/packetDatabase");
 //Add css styling
 require("!style!css!../css/main.css");
-var totalPackets;
 var contentElement = document.getElementById("content");
 var sideBarElement = document.getElementById("sideBar");
 //Method to start capturing packets
@@ -48,22 +47,17 @@ sideBar.build(sideBarElement);
 // capture.build(contentElement,startCap,stopCap);
 databaseInterface.build(contentElement);
 
-totalPackets = document.getElementById("totalPackets");
-packetDatabase.getNumPackets(function( err, count ){
-    if(err){
-        console.err(err);
-    }else{
-        totalPackets.innerHTML = count;
-    }
-});
-
 sideBar.setCapInfoOnclick(function(){
     //Build capture content
     capture.build(contentElement,startCap,stopCap);
+    document.getElementById("databaseInfoContainer").style["background-color"] = "#2b303b";
+    document.getElementById("capContainer").style["background-color"] = "#21252d";
 });
 
 sideBar.setDatabaseInfoOnclick(function(){
     databaseInterface.build(contentElement);
+    document.getElementById("capContainer").style["background-color"] = "#2b303b";
+    document.getElementById("databaseInfoContainer").style["background-color"] = "#21252d";
 });
 //Make sure that we close pcap when the user refreshes or leaves
 window.onbeforeunload = function (e) {
