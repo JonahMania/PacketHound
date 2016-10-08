@@ -55,18 +55,25 @@ function drawPacket( domElement, packet, onclick ){
             onclick(packet);
         })
         .on("mouseover",function(){
-            d3.select(this)
-            .attr("x",0)
-            .attr("y",0)
-            .attr("width",blockWidth)
-            .attr("height",blockHeight);
+            // d3.select(this.parentNode)
+            // .attr("width",blockWidth+10)
+            // .attr("height",blockHeight+10);
+            // // .style("position");
+            // d3.select(this)
+            // .attr("x",0)
+            // .attr("y",0)
+            // .attr("width",blockWidth+10)
+            // .attr("height",blockHeight+10);
         })
         .on("mouseout",function(){
-            d3.select(this)
-            .attr("x",padding)
-            .attr("y",padding)
-            .attr("width",blockWidth-padding*2)
-            .attr("height",blockHeight-padding*2);
+            // d3.select(this.parentNode)
+            // .attr("width",blockWidth)
+            // .attr("height",blockHeight);
+            // d3.select(this)
+            // .attr("x",padding)
+            // .attr("y",padding)
+            // .attr("width",blockWidth-padding*2)
+            // .attr("height",blockHeight-padding*2);
         })
         .attr("class","databaseVisPacket")
         .style("fill",t.url());

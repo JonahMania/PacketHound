@@ -9,10 +9,10 @@ function build( domElement ){
 }
 
 function setPacket( packet ){
-    var ethernetHeaderVis = document.getElementById("ethernetHeaderVis");
+    var packetViewContainer = document.getElementById("packetViewContainer");
     var packetVisBack = document.getElementById("packetVisBack");
     packetVisBack.onclick = collapse;
-    // drawPacket.draw(ethernetHeaderVis,packet);
+    drawPacket.draw(packetViewContainer,packet);
 }
 
 function expand(){
