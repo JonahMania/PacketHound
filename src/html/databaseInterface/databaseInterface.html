@@ -1,7 +1,38 @@
-<div id="databaseVisContainer">
+<div id="databaseVisWrapper">
+    <div>
+        <p id="databaseVisPackets"></p>
+        <p id="databaseVisDates"></p>
+    </div>
+    <div>
+        <div id="databaseVisKey"></div>
+    </div>
+    <div id="databaseVisContainer">
+    </div>
 </div>
 <div id="databaseFilterContainer">
-    <h2>Filters</h2>
+    <div id="databaseFilterHeader">
+        <h2>Database</h2>
+        <p id="totalPackets">Total packets: loading...</p>
+        <p id="sizeOnDisk">Size on disk: loading...</p>
+    </div>
+    <div id="filters">
+        <div id="srcMacFilter">
+            <p>Source Mac Address</p>
+            <input></input>
+        </div>
+        <div id="destMacFilter">
+            <p>Destination Mac Address</p>
+            <input></input>
+        </div>
+        <div id="srcIpFilter">
+            <p>Source IP Address</p>
+            <input></input>
+        </div>
+        <div id="destIpFilter">
+            <p>Destination IP Address</p>
+            <input></input>
+        </div>
+    </div>
 </div>
 <div id="packetVisContainer">
 </div>

@@ -10,13 +10,20 @@ function build( domElement ){
 
 function setPacket( packet ){
     var ethernetHeaderVis = document.getElementById("ethernetHeaderVis");
-    drawPacket.draw(ethernetHeaderVis,packet);
+    var packetVisBack = document.getElementById("packetVisBack");
+    packetVisBack.onclick = collapse;
+    // drawPacket.draw(ethernetHeaderVis,packet);
 }
 
 function expand(){
-    container.style.right = 0;
+    container.style.left = "80px";
+}
+
+function collapse(){
+    container.style.left = "calc( -50% + 40px )";
 }
 
 module.exports.build = build;
 module.exports.setPacket = setPacket;
 module.exports.expand = expand;
+module.exports.collapse = collapse;
