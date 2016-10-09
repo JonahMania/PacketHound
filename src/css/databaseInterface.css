@@ -79,6 +79,12 @@
     transition: left 1s cubic-bezier(0.645, 0.045, 0.355, 1);
 }
 
+#packetTimestamp {
+    padding-top: 0px;
+    padding-left: 10px;
+    font-size: 20px;
+}
+
 #packetVisContainer > div {
     width: 100%;
 }
@@ -114,4 +120,9 @@
 .packetBlock {
     stroke:black;
     stroke-width:3px;
+}
+
+.packetBlockText {
+    font-size: 20px;
+    font-weight: bolder;
 }
