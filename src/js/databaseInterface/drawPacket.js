@@ -27,7 +27,13 @@ function drawHeader( domElement, packet, headerDesc, bytes, blockHeight ){
         var height = 0;
         var x = 0;
         var y = 0;
-        var textX = ( currXPos / bytes ) * 100 + "%";
+        var textX
+        
+        if( blockBytes >= bytes - currXPos ){
+            textX = ( currXPos / bytes ) * 100 + ( ( ( bytes - currXPos ) / bytes ) * 100 ) / 2 + "%";
+        }else{
+            textX = ( currXPos / bytes ) * 100 + ( ( blockBytes / bytes ) * 100 ) / 2 + "%";
+        }
         var textY = currYPos + blockHeight / 2 + "px";
 
         while( blockBytes > 0 ){
@@ -74,6 +80,7 @@ function drawHeader( domElement, packet, headerDesc, bytes, blockHeight ){
             .attr("y", textY )
             .attr("dy", ".35em")
             .attr("style","z-index:40;")
+            .style("text-anchor", "middle")
             .attr("class","packetBlockText")
             .text(block.name+": "+packet[block.field]);
     });

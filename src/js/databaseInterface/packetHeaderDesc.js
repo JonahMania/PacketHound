@@ -5,34 +5,31 @@ let ethernetHeader = [
         "name":"Src Mac",
         "size": 6,
         "field": "etherSrcAddr",
-        "texture": textures.paths()
-        .d("caps")
+        "texture": textures.lines()
         .lighter()
-        .thicker()
-        .stroke("black")
-        .background("white")
+        .size(8)
+        .stroke("#01579b")
+        .background("#03a9f4")
     },
     {
         "name":"Dest Mac",
         "size": 6,
         "field": "etherDestAddr",
-        "texture": textures.paths()
-        .d("caps")
+        "texture": textures.lines()
         .lighter()
-        .thicker()
-        .stroke("blue")
-        .background("white")
+        .size(8)
+        .stroke("#ffcdd2")
+        .background("#f44336")
     },
     {
         "name":"Type",
         "size": 2,
         "field": "etherType",
-        "texture": textures.paths()
-        .d("caps")
+        "texture": textures.lines()
         .lighter()
-        .thicker()
-        .stroke("red")
-        .background("white")
+        .size(8)
+        .stroke("#607d8b")
+        .background("#cfd8dc")
     }
 ];
 
@@ -41,19 +38,24 @@ let ipHeader = [
         "name":"Src IP",
         "size": 4,
         "field": "ipSrcAddr",
-        "texture": textures.lines()
-        .strokeWidth(1)
-        .stroke("blue")
-        .background("white")
+        "texture": textures.paths()
+        .d("nylon")
+        .lighter()
+        .shapeRendering("crispEdges")
+        .stroke("#ffecb3")
+        .background("#ffc107")
+
     },
     {
         "name":"Dest IP",
         "size": 4,
         "field": "ipDestAddr",
-        "texture": textures.lines()
-        .strokeWidth(1)
-        .stroke("red")
-        .background("white")
+        "texture": textures.paths()
+        .d("nylon")
+        .lighter()
+        .shapeRendering("crispEdges")
+        .stroke("#3f51b5")
+        .background("#9fa8da")
     }
 ];
 
