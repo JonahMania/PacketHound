@@ -27,8 +27,12 @@ function drawHeader( domElement, packet, headerDesc, bytes, blockHeight ){
         var height = 0;
         var x = 0;
         var y = 0;
-        var textX
-        
+        var text;
+        var textX;
+        var textBackground;
+        //Padding around the text background rect in px
+        var textBackgroundPadding = 6;
+
         if( blockBytes >= bytes - currXPos ){
             textX = ( currXPos / bytes ) * 100 + ( ( ( bytes - currXPos ) / bytes ) * 100 ) / 2 + "%";
         }else{
@@ -73,16 +77,25 @@ function drawHeader( domElement, packet, headerDesc, bytes, blockHeight ){
                 .attr("class","packetBlock")
                 .style("fill",block.texture.url());
         }
-
+        //Add background first so its behind text element
+        textBackground = svg.append("rect");
         //Add text
-        svg.append("text")
+        text = svg.append("text")
             .attr("x", textX )
             .attr("y", textY )
             .attr("dy", ".35em")
-            .attr("style","z-index:40;")
+            // .attr("style","z-index:40;")
             .style("text-anchor", "middle")
             .attr("class","packetBlockText")
             .text(block.name+": "+packet[block.field]);
+        text = text._groups[0][0].getBBox();
+        //Set text background attributes
+        textBackground.attr("x",text.x - textBackgroundPadding / 2 )
+        .attr("y",text.y - textBackgroundPadding / 2)
+        .attr("width",text.width + textBackgroundPadding)
+        .attr("height",text.height + textBackgroundPadding)
+        .style("fill",block.textBackground);
+
     });
 }
 
@@ -106,6 +119,8 @@ function draw( domElement, packet ){
 
     drawHeader( ethernetHeader, packet, packetHeaderDesc.ethernetHeader, bytes, blockHeight );
     drawHeader( ipHeader, packet, packetHeaderDesc.ipHeader, bytes, blockHeight );
+    drawHeader( tcpHeader, packet, packetHeaderDesc.tcpHeader, bytes, blockHeight );
+
 }
 
 module.exports.draw = draw;
