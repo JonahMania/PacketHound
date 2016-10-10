@@ -2,7 +2,7 @@
 #include "../utils/hexDump.h"
 
 //Sets the headers in packet to the object obj
-int setHeaders( v8::Local<v8::Object> *obj, const u_char *packet )
+int setHeaders( v8::Local<v8::Object> *obj, const u_char *packet, int packetSize )
 {
     //Ethernet header
     const struct etherHeader *ethr;
@@ -18,6 +18,10 @@ int setHeaders( v8::Local<v8::Object> *obj, const u_char *packet )
     char etherDestAddrHex[ETHER_ADDR_LEN*2+1];
     //Ethernet src max address in hex
     char etherSrcAddrHex[ETHER_ADDR_LEN*2+1];
+    //Length of all headers
+    int totalHeaderSize = 0;
+    //Size of packet data
+    int packetDataSize = 0;
     //Set header struct values to object
     //Ethernet header
     hexDump(ethr->etherDestAddr,ETHER_ADDR_LEN, etherDestAddrHex);
@@ -35,6 +39,12 @@ int setHeaders( v8::Local<v8::Object> *obj, const u_char *packet )
     //TCP header
     Nan::Set(*obj,Nan::New("tcpSrcPort").ToLocalChecked(),Nan::New(ntohs(tcp->tcpSrcPort)));
     Nan::Set(*obj,Nan::New("tcpDestPort").ToLocalChecked(),Nan::New(ntohs(tcp->tcpDestPort)));
+    //Packet data
+    totalHeaderSize = ETHER_HDR_LEN+sizeof(struct ipHeader)+(4 * tcp->tcpOffset);
+    packetDataSize = packetSize - totalHeaderSize;
+    char packetData[packetDataSize*2+1];
+    hexDump( (u_char*)packet+totalHeaderSize,packetDataSize,packetData );
+    Nan::Set(*obj,Nan::New("data").ToLocalChecked(),Nan::New(packetData).ToLocalChecked());
 
     return 0;
 }

@@ -65,7 +65,7 @@
 
 #packetVisContainer {
     font-family: JosefinSlab;
-    overflow: hidden;
+    overflow: scroll;
     width:calc( 50% - 40px );
     height:100%;
     position: fixed;
@@ -78,6 +78,11 @@
     -o-transition: left 1s cubic-bezier(0.645, 0.045, 0.355, 1);
     transition: left 1s cubic-bezier(0.645, 0.045, 0.355, 1);
 }
+
+#packetVisContainer::-webkit-scrollbar {
+    display: none;
+}
+
 
 #packetTimestamp {
     padding-top: 0px;
@@ -124,6 +129,20 @@
 
 .packetBlockText {
     font-size: 20px;
-    font-weight: bolder;
+    font-weight: bold;
     fill:black;
+}
+
+.packetDataWrapper {
+    border-size:2px;
+    border-style:solid;
+    border-color:black;
+
+}
+
+.packetDataWrapper p {
+    padding:6px;
+    word-wrap: break-word;
+    background-color: #00e676;
+    font-size: 16px;
 }

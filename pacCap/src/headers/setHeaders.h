@@ -10,6 +10,6 @@
 #include "tcpHeader.h"
 
 //Sets the headers in packet to the object obj
-int setHeaders( v8::Local<v8::Object> *obj, const u_char *packet );
+int setHeaders( v8::Local<v8::Object> *obj, const u_char *packet, int packetSize );
 
 #endif

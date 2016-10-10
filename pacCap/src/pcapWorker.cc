@@ -159,7 +159,7 @@ void PcapWorker::HandleProgressCallback( const Packet* data, size_t size )
         //Set the packet size in bytes to the object
         Nan::Set(obj,Nan::New("size").ToLocalChecked(),Nan::New(buffer[i].h->len));
         //Set all the headers from the packet
-        setHeaders( &obj, buffer[i].p );
+        setHeaders( &obj, buffer[i].p, buffer[i].h->len );
         response->Set(i, obj );
         //Free memory allocated with malloc
         free( (void*)buffer[i].h );

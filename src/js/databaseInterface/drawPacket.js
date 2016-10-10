@@ -1,5 +1,6 @@
 const d3 = require("d3");
 const time = require("../utils/time");
+const hex = require("../utils/hex");
 const packetHeaderDesc = require("./packetHeaderDesc");
 
 function drawHeader( domElement, packet, headerDesc, bytes, blockHeight ){
@@ -100,26 +101,38 @@ function drawHeader( domElement, packet, headerDesc, bytes, blockHeight ){
 }
 
 function draw( domElement, packet ){
+
     var packetTimestamp = document.getElementById("packetTimestamp");
+    var showBytes = document.getElementById("showBytes");
+    var showHex = document.getElementById("showHex");
+    var showAscii = document.getElementById("showAscii");
     var ethernetHeader = document.createElement("div");
     var ipHeader = document.createElement("div");
     var tcpHeader = document.createElement("div");
-    var packetData = document.createElement("div");
+    var packetDataWrapper = document.createElement("div");
+    var packetData = document.createElement("p");
+
     //Number of bytes to put across the top of the packet vis
     var bytes = 4;
     //Height of a block in the packet vis
     var blockHeight = 40;
 
+    packetDataWrapper.className += "packetDataWrapper";
     packetTimestamp.innerHTML = time.timestampToDate( packet.timestamp );
     domElement.innerHTML = "";
     domElement.appendChild(ethernetHeader);
     domElement.appendChild(ipHeader);
     domElement.appendChild(tcpHeader);
-    domElement.appendChild(packetData);
+    packetDataWrapper.appendChild(packetData);
+    domElement.appendChild(packetDataWrapper);
 
     drawHeader( ethernetHeader, packet, packetHeaderDesc.ethernetHeader, bytes, blockHeight );
     drawHeader( ipHeader, packet, packetHeaderDesc.ipHeader, bytes, blockHeight );
     drawHeader( tcpHeader, packet, packetHeaderDesc.tcpHeader, bytes, blockHeight );
+    packetData.innerHTML = hex.toAscii(packet.data);
+    showBytes.onclick = function(){ packetData.innerHTML = hex.toBytes(packet.data); };
+    showHex.onclick = function(){ packetData.innerHTML = packet.data.replace(/(.{2})/g,"$1 "); };
+    showAscii.onclick = function(){ packetData.innerHTML = hex.toAscii(packet.data); };
 
 }
 
