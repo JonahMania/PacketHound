@@ -1,6 +1,7 @@
-pacCap/build/
-pacCap/node_modules/
-pacCap/test.js
+src/public
+src/pacCap/build/
+src/pacCap/node_modules/
+src/pacCap/test.js
 node_modules
 build/
 src/build/

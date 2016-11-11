@@ -1,17 +1,32 @@
+const webpack = require("webpack");
+const path = require("path");
+
 module.exports = {
-    entry:  './src/js/packetHound.js',
-    output: {
-        path: 'src/build',
-        filename: 'bundle.js',
+    entry: {
+        packet:'./src/app/js/packet/packet.js',
+        packets:'./src/app/js/packets/packets.js',
+        database:'./src/app/js/database/database.js'
     },
-    externals: {
-        'electron': 'require("electron")',
-        "../../pacCap/build/Release/pacCap":"require('../../pacCap/build/Release/pacCap');"
+    output: {
+        path: 'src/public/database',
+        filename: '[name].bundle.js',
     },
     module: {
         loaders: [
             { test: /\.(png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader?limit=100000' }
         ]
+    },
+    plugins: [
+        new webpack.ProvidePlugin({
+           d3: './node_modules/d3/build/d3'
+       })
+    ],
+    resolve: {
+        root: path.resolve(__dirname),
+            alias: {
+            //Use this to point d3 requires to the correct d3 file
+            d3: 'node_modules/d3/build/d3',
+        }
     },
     target: 'node'
 };

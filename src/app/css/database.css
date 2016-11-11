@@ -1,0 +1,104 @@
+@font-face {
+   font-family: JosefinSlab;
+   src: url("../resources/fonts/JosefinSlab-Regular.ttf");
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    height:100%;
+    width:100%;
+}
+
+body {
+    background-color: #f4f4f4;
+    height:100%;
+    width:100%;
+}
+
+
+#databaseVisWrapper {
+    /*padding:20px;*/
+    height:100%;
+    width:50%;
+    float:right;
+    overflow-y: scroll;
+    font-family: JosefinSlab;
+}
+
+#databaseVisWrapper > div {
+    padding: 10px;
+    font-size: 20px;
+}
+
+#databaseVisWrapper::-webkit-scrollbar {
+    display: none;
+}
+
+#databaseVisContainer {
+    padding:6px;
+}
+
+#databaseFilterContainer {
+    font-family: JosefinSlab;
+    width: 50%;
+    height: 100%;
+    float:left;
+}
+
+#databaseFilterHeader {
+    padding: 10px;
+}
+
+#filters {
+    padding: 10px;
+}
+
+#filters > div {
+    width:100%;
+    height: 20px;
+    padding:2px;
+}
+#filters > div > input {
+    display: inline-block;
+    /*width:30%;*/
+    /*float: right;*/
+    font-family: JosefinSlab;
+    margin-left:20px;
+    border-color: black;
+    border-top: hidden;
+    border-left: hidden;
+    border-right: hidden;
+    background-color: transparent;
+    border-width: 1px;
+}
+
+#filters > div > p {
+    display: inline-block;
+    float:left;
+}
+
+#packetOverlayContainer {
+    font-family: JosefinSlab;
+    overflow: scroll;
+    width:calc( 50% - 40px );
+    height:100%;
+    position: fixed;
+    z-index: 1;
+    background-color: #f4f4f4;
+    left:-50%;
+    -webkit-transition: left 1s cubic-bezier(0.645, 0.045, 0.355, 1);
+    -moz-transition: left 1s cubic-bezier(0.645, 0.045, 0.355, 1);
+    -ms-transition: left 1s cubic-bezier(0.645, 0.045, 0.355, 1);
+    -o-transition: left 1s cubic-bezier(0.645, 0.045, 0.355, 1);
+    transition: left 1s cubic-bezier(0.645, 0.045, 0.355, 1);
+    padding:8px;
+    /*overflow: -moz-scrollbars-none;*/
+}
+
+#packetOverlayContainer::-webkit-scrollbar {
+    display: none;
+}

@@ -1,0 +1,8 @@
+#packetsVisContainer {
+    overflow-x:hidden;
+}
+
+.databaseVisPacket {
+    stroke:black;
+    stroke-width:2px;
+}
