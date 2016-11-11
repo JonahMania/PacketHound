@@ -3,6 +3,6 @@ db = {};
 //Database for storing packets
 db.packets = new Datastore({ filename: './databases/packets.db', autoload: true });
 //Database for storing user settings
-db.settings = new Datastore({ filename: './databases/settings.db', autoload: true });
+db.sessions = new Datastore({ filename: './databases/sessions.db', autoload: true });
 //Expose databases
 module.exports = db;

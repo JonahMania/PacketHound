@@ -1,4 +1,3 @@
-// const db = require('electron').remote.require('../js/database/database').packets;
 const db = require('./database').packets;
 /**
 * Inserts a new packet into the database
