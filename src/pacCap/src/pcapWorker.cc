@@ -53,6 +53,28 @@ PcapWorker::~PcapWorker()
     if( this->length != 0 ){
         free(this->filters);
     }
+    if( this->specDevice ){
+        free( this->device );
+    }
+}
+
+char* PcapWorker::setDevice( char* d, int length )
+{
+    if( d == NULL || length == 0 ){
+        //Get the device to sniff on
+        this->device = pcap_lookupdev( errbuf );
+        this->specDevice = false;
+    }else{
+        //Allocate the correct amount of memory
+        this->device = (char*)malloc(length*sizeof(char));
+        //Set block to 0s
+        memset(this->device,0,length*sizeof(char));
+        //Copy device string
+        memcpy(device,d,length*sizeof(char));
+        this->specDevice = true;
+    }
+
+    return device;
 }
 
 void PcapWorker::Execute(const ExecutionProgress& progress)
@@ -60,15 +82,13 @@ void PcapWorker::Execute(const ExecutionProgress& progress)
 
     //ID for the pcap thread
     pthread_t pid;
-    //The device to capture packets on
-    char* device;
     //A filter to set to the pcap handler to filter out specific packets
     struct bpf_program filterProgram;
     //Ip of our device
     bpf_u_int32 net;
+    //Mask of our device
+    bpf_u_int32 mask;
 
-    //Get the device to sniff on
-    device = pcap_lookupdev( errbuf );
     //Check if the device was found succesfuly
     if( device == NULL )
     {
@@ -76,8 +96,10 @@ void PcapWorker::Execute(const ExecutionProgress& progress)
         SetErrorMessage(errbuf);
         return;
     }
+
     //Attempt to hopen a pcap session
     pcap_handle = pcap_open_live( device, 4096, 1, 0, errbuf );
+
     //Error check
     if( pcap_handle == NULL )
     {
@@ -85,6 +107,9 @@ void PcapWorker::Execute(const ExecutionProgress& progress)
         SetErrorMessage(errbuf);
         return;
     }
+
+    pcap_lookupnet(device,&net,&mask,errbuf);
+
     //Check if there was filters passed to the worker
     if( this->length != 0 )
     {
@@ -104,6 +129,7 @@ void PcapWorker::Execute(const ExecutionProgress& progress)
             return;
         }
     };
+
 
     if( sem_init( &sem, 0, 1 ) == -1 )
     {
@@ -133,6 +159,7 @@ void PcapWorker::Execute(const ExecutionProgress& progress)
         SetErrorMessage("ERROR: sem_destroy");
         return;
     }
+
 }
 
 void PcapWorker::HandleProgressCallback( const Packet* data, size_t size )

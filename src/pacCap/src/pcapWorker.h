@@ -25,7 +25,7 @@ extern char errbuf[PCAP_ERRBUF_SIZE];
 //Global handler
 extern pcap_t *pcap_handle;
 //Struct to hold raw packet data
-struct Packet{
+struct Packet {
     const struct pcap_pkthdr *h;
     const u_char *p;
 };
@@ -37,10 +37,14 @@ class PcapWorker : public Nan::AsyncProgressWorkerBase<Packet>
         ~PcapWorker();
         void Execute(const ExecutionProgress& progress);
         void HandleProgressCallback( const Packet* data, size_t size );
-
+        char* setDevice( char* device, int length );
     private:
         char* filters;
         size_t length;
+        //The device to capture packets on
+        char* device;
+        //True if specific device was set
+        bool specDevice;
         Nan::Callback *callback;
         Nan::Callback *progress;
 

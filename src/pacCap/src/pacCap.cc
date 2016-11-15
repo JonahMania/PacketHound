@@ -8,6 +8,10 @@ NAN_METHOD(start)
     char* filters;
     //Size of filter string
     int length;
+    //Worker to run pcap on
+    PcapWorker* worker;
+    //Device that pcap is running on
+    char* device;
     //Check that at least one argument was passed
     if (info.Length() < 1)
     {
@@ -17,6 +21,12 @@ NAN_METHOD(start)
 
     //Check if the second argument passed is a string
     if (info.Length() > 1 && !info[1]->IsString())
+    {
+        Nan::ThrowTypeError("Wrong argument type");
+        return;
+    }
+
+    if( info.Length() > 2 && !info[2]->IsString() )
     {
         Nan::ThrowTypeError("Wrong argument type");
         return;
@@ -36,9 +46,16 @@ NAN_METHOD(start)
         length = 0;
     }
 
-    Nan::AsyncQueueWorker(new PcapWorker(callback,callback,filters,length));
+    worker = new PcapWorker(callback,callback,filters,length);
 
-    info.GetReturnValue().Set(true);
+    if( info.Length() > 2 ){
+        device = worker->setDevice( *Nan::Utf8String(info[2]->ToString()), Nan::Utf8String(info[2]->ToString()).length() );
+    }else{
+        device = worker->setDevice( NULL, 0 );
+    }
+
+    Nan::AsyncQueueWorker(worker);
+    info.GetReturnValue().Set( v8::String::NewFromUtf8(info.GetIsolate(), device));
 }
 
 NAN_METHOD(getError)

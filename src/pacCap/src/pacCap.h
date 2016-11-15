@@ -7,6 +7,7 @@
 #include <node.h>
 #include <pthread.h>
 #include <nan.h>
+#include <ifaddrs.h>
 
 //External code
 #include "pcapWorker.h"
