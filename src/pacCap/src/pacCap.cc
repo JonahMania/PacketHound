@@ -11,7 +11,10 @@ NAN_METHOD(start)
     //Worker to run pcap on
     PcapWorker* worker;
     //Device that pcap is running on
-    char* device;
+    Device *device;
+    //Object to return from the function
+    v8::Local<v8::Object> obj = Nan::New<v8::Object>();
+
     //Check that at least one argument was passed
     if (info.Length() < 1)
     {
@@ -54,8 +57,13 @@ NAN_METHOD(start)
         device = worker->setDevice( NULL, 0 );
     }
 
+    //Create a return object
+    Nan::Set(obj,Nan::New("name").ToLocalChecked(),v8::String::NewFromUtf8(info.GetIsolate(), device->name));
+    Nan::Set(obj,Nan::New("address").ToLocalChecked(),v8::String::NewFromUtf8(info.GetIsolate(), inet_ntoa(device->address)));
+    Nan::Set(obj,Nan::New("mask").ToLocalChecked(),v8::String::NewFromUtf8(info.GetIsolate(), inet_ntoa(device->mask)));
+
     Nan::AsyncQueueWorker(worker);
-    info.GetReturnValue().Set( v8::String::NewFromUtf8(info.GetIsolate(), device));
+    info.GetReturnValue().Set( obj );
 }
 
 NAN_METHOD(getError)

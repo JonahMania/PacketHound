@@ -9,7 +9,6 @@ function createSession(timestamp, callback){
         "startTime":timestamp,
         "endTime":"",
         "network":{
-            "devices":[]
         }
     };
     db.insert(newSession,function(error,newSession){
@@ -34,12 +33,43 @@ function getSession( sessionId, callback ){
     });
 }
 /**
-* Adds a new device to the session devices list
+* Updates the list of devices currently on the network
+* @param {string} sessionId The id of the session
+* @param {object} devices The devices to add in the database
+* @param {function} callback Function to run when when the devices list is
+* updated
 */
-function addDevice( sessionId, device ){
-
+function updateDevices( sessionId, devices, callback ){
+    db.update({ _id: sessionId }, { $set: { "network.devices" :  devices  } }, {}, function (error, numReplaced) {
+        callback(error,devices);
+    });
+}
+/**
+* Adds the capture device of the system to the session
+* @param {string} sessionId The id of the session
+* @param {object} device The device to add in the database
+* @param {function} callback Function to run when when the capture device is
+* updated
+*/
+function addSystemDevice( sessionId, device, callback ){
+    db.update({ _id: sessionId },  { $set: { "network.captureDevice": device } }, {}, function (error, numReplaced) {
+        callback(error,device);
+    });
+}
+/**
+* Sets the end time of a session
+* @param {string} sessionId The id of the session
+* @param {string} timestamp The time when the session ended
+* @param {function} callback Function to run when when the update is complete
+*/
+function endSession( sessionId, timestamp, callback ){
+    db.update({ _id: sessionId },  { $set: { "endTime": timestamp } }, {}, function (error, numReplaced) {
+        callback(error,timestamp);
+    });
 }
 
 module.exports.createSession = createSession;
 module.exports.getSession = getSession;
-module.exports.addDevice = addDevice;
+module.exports.updateDevices = updateDevices;
+module.exports.addSystemDevice = addSystemDevice;
+module.exports.endSession = endSession;

@@ -29,6 +29,12 @@ struct Packet {
     const struct pcap_pkthdr *h;
     const u_char *p;
 };
+//Struct to hold device information
+struct Device {
+    char* name;
+    struct in_addr address;
+    struct in_addr mask;
+};
 
 class PcapWorker : public Nan::AsyncProgressWorkerBase<Packet>
 {
@@ -37,14 +43,12 @@ class PcapWorker : public Nan::AsyncProgressWorkerBase<Packet>
         ~PcapWorker();
         void Execute(const ExecutionProgress& progress);
         void HandleProgressCallback( const Packet* data, size_t size );
-        char* setDevice( char* device, int length );
+        Device *setDevice( char* device, int length );
     private:
         char* filters;
         size_t length;
         //The device to capture packets on
-        char* device;
-        //True if specific device was set
-        bool specDevice;
+        Device *device;
         Nan::Callback *callback;
         Nan::Callback *progress;
 

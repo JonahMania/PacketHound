@@ -53,28 +53,63 @@ PcapWorker::~PcapWorker()
     if( this->length != 0 ){
         free(this->filters);
     }
-    if( this->specDevice ){
-        free( this->device );
-    }
+    free( this->device->name);
+    free( this->device );
 }
 
-char* PcapWorker::setDevice( char* d, int length )
+Device *PcapWorker::setDevice( char* d, int length )
 {
-    if( d == NULL || length == 0 ){
-        //Get the device to sniff on
-        this->device = pcap_lookupdev( errbuf );
-        this->specDevice = false;
-    }else{
-        //Allocate the correct amount of memory
-        this->device = (char*)malloc(length*sizeof(char));
-        //Set block to 0s
-        memset(this->device,0,length*sizeof(char));
-        //Copy device string
-        memcpy(device,d,length*sizeof(char));
-        this->specDevice = true;
+    //All devices on the machine
+    pcap_if_t *alldevs;
+    //Device name
+    char* deviceName;
+    pcap_if_t *i;
+    pcap_addr_t *a;
+    //Set device to null by default
+    this->device = NULL;
+    //find all devices on the machine
+    if( pcap_findalldevs(&alldevs, errbuf) != 0 )
+    {
+        //ERROR
+        SetErrorMessage(errbuf);
+        return this->device;
     }
 
-    return device;
+    //If the user has not passed a device to capture on
+    if( d == NULL || length == 0 ){
+        //Get the device to sniff on
+        deviceName = pcap_lookupdev( errbuf );
+    }else{
+        deviceName = d;
+    }
+
+    //Loop through all devices
+    for( i = alldevs; i != NULL; i = i->next ) {
+        //If the current device is the one we are looking for
+        if( strcmp( i->name, deviceName ) == 0 )
+        {
+            //Allocate space for the device struct
+            this->device = (Device*)malloc(sizeof(Device));
+            //Allocate space for the name of the device
+            this->device->name = (char*)malloc( strlen(i->name) * sizeof(char) + 1 );
+            memset( this->device->name, 0, strlen(i->name) * sizeof(char) + 1 );
+            memcpy( this->device->name, i->name, strlen(i->name) * sizeof(char) );
+
+            for( a = i->addresses; a != NULL; a = a->next )
+            {
+                if(a->addr->sa_family == AF_INET)
+                {
+                    this->device->address = ((struct sockaddr_in*)a->addr)->sin_addr;
+                    this->device->mask = ((struct sockaddr_in*)a->netmask)->sin_addr;
+                    break;
+                }
+            }
+        }
+    }
+
+    //Free device array
+    pcap_freealldevs(alldevs);
+    return this->device;
 }
 
 void PcapWorker::Execute(const ExecutionProgress& progress)
@@ -98,7 +133,7 @@ void PcapWorker::Execute(const ExecutionProgress& progress)
     }
 
     //Attempt to hopen a pcap session
-    pcap_handle = pcap_open_live( device, 4096, 1, 0, errbuf );
+    pcap_handle = pcap_open_live( device->name, 4096, 1, 0, errbuf );
 
     //Error check
     if( pcap_handle == NULL )
@@ -108,7 +143,7 @@ void PcapWorker::Execute(const ExecutionProgress& progress)
         return;
     }
 
-    pcap_lookupnet(device,&net,&mask,errbuf);
+    pcap_lookupnet(device->name,&net,&mask,errbuf);
 
     //Check if there was filters passed to the worker
     if( this->length != 0 )

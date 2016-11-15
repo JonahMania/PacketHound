@@ -17,10 +17,16 @@ let filters = "";
 let verbose = false;
 //Flag to run pacCap
 let capture = false;
-//Device that pacCap is running on
+//Device to pass to pcap
 var device = "";
+//Device that pcap is using
+var captureDevice = {};
+//All interfaces on the machine
+var interfaces = network.getInterfaces();
 //A map of all local devices on the network
 var localDevices = {};
+//Id of the current session
+var sessionId = null;
 
 //Get command line arguments
 argv.forEach(function( arg, index ){
@@ -45,24 +51,27 @@ argv.forEach(function( arg, index ){
             break;
     }
 });
-
 if( capture ){
-    //Create new session
-    // sessionDatabase.createSession(String(Math.floor(new Date() / 1000)),function(error,newSession){
-    //     console.log("New session created with id: ",newSession._id);
-    // });
     //Start pacCap
-    device = pacCap.start(function(packets,error){
+    captureDevice = pacCap.start(function(packets,error){
         if( error ){
             console.error("ERROR: ",error);
         }else{
-            console.log( network.getLocalDevice( packets[0], device ) );
-            //If verbose was requested print all incomming packets
-            if( verbose ){
-                packets.forEach(function(packet){
-                    console.log( "captured packet of size:", packet.size );
-                });
-            }
+            packets.forEach(function(packet){
+                if( network.getLocalDevice( packet, captureDevice, localDevices ) ){
+                    //Print data if verbose mode is selected
+                    if( verbose ){
+                        console.log( "New local devices found. Current device list:", localDevices );
+                    }
+                    //Update the device list in the session database
+                    sessionDatabase.updateDevices(sessionId,localDevices,function(error,newDevices){
+                        if(error){
+                            console.error(error);
+                        }
+                    });
+                }
+
+            })
             if( packets != undefined ){
                 //Insert packet into database
                 packetDatabase.insertPacket(packets,function(error,response){
@@ -74,8 +83,27 @@ if( capture ){
         }
     }, filters, device);
 
+    //Create new session
+    sessionDatabase.createSession(String(Math.floor(new Date() / 1000)),function(error,newSession){
+        if( error ){
+            console.error(error);
+        }else{
+            sessionId = newSession._id;
+
+            if( verbose ){
+                console.log("New session created with id: ",newSession._id);
+            }
+            //Add the capture device to the session
+            sessionDatabase.addSystemDevice( newSession._id, captureDevice, function( error, newDevice ){
+                if( error ){
+                    console.error(error);
+                }
+            });
+        }
+    });
+
     if( verbose ){
-        console.log( "capturing on interface:", device );
+        console.log( "capturing on interface:", captureDevice.name );
     }
 }
 
@@ -93,7 +121,14 @@ app.listen(port, function(){
 //Signal handler ( ctrl+c )
 process.on( 'SIGINT', function(){
     if( capture ){
-        pacCap.close();
+        sessionDatabase.endSession(sessionId,String(Math.floor(new Date() / 1000)),function(error,time){
+            if(error){
+                console.error(error);
+            }
+            pacCap.close();
+            process.exit(0);
+        });
+    }else{
+        process.exit(0);
     }
-    process.exit(0);
 });
