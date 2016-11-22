@@ -17,20 +17,28 @@ function createSession(timestamp, callback){
 }
 /**
 * Gets a session from the database
-* @param {string} sessionId The id of the session
+* @param {string} sessionId The id of the session if no id is passed the latest session is returned
 * @param {function} callback Function to run when when the session is recieved
 */
 function getSession( sessionId, callback ){
     //Error checking
     if( sessionId === undefined ){
-        return callback(Error("sessionId param is required"),null);
+        
+        db.find({}).sort({ startTime: -1 }).limit(1).exec(function(error, session){
+            if( session == null ){
+                return callback(Error("could not find latest session"));
+            }
+            return callback(error,session);
+        });
+    }else{
+        db.findOne({_id:sessionId},function(error,session){
+            if( session == null ){
+                return callback(Error("could not find session with id: "+sessionId));
+            }
+            return callback( error, session );
+        });
     }
-    db.findOne({_id:sessionId},function(error,session){
-        if( session == null ){
-            return callback(Error("could not find session with id: "+sessionId));
-        }
-        return callback( error, session );
-    });
+
 }
 /**
 * Updates the list of devices currently on the network
