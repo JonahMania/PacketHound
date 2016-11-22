@@ -30,18 +30,18 @@ function getLocalDevice( packet, device, localDevices ){
     //Check if both masked addess are the same
     if( ( ip & mask ) == ( srcIp & mask ) ){
         if( !localDevices[packet.etherSrcAddr] ){
-            localDevices[packet.etherSrcAddr] = true;
+            localDevices[packet.etherSrcAddr] = packet.ipSrcAddr;
             ret = true;
         }
     }
     if( ( ip & mask ) == ( destIp & mask ) ){
         if( !localDevices[packet.etherDestAddr] ){
-            localDevices[packet.etherDestAddr] = true;
+            localDevices[packet.etherDestAddr] = packet.ipDestAddr;
             ret = true;
         }
     }
 
-    return ret
+    return ret;
 }
 
 module.exports.getInterfaces = getInterfaces;

@@ -6,3 +6,4 @@ node_modules
 build/
 src/build/
 databases/
+npm-debug.log

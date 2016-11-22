@@ -1,6 +1,6 @@
 /**
 * Gets the current paramers in the url
-* @return {object} params The parameters in the current url
+* @return {object} The parameters in the current url
 */
 function getParams(){
     let params = {};
