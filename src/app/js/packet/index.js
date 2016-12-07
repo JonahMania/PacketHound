@@ -39,10 +39,7 @@ function drawHeader( domElement, packet, headerDesc, bytes, blockHeight ){
         var x = 0;
         var y = 0;
         var text;
-        var textX;
-        var textBackground;
-        //Padding around the text background rect in px
-        var textBackgroundPadding = 6;
+        var rect;
 
         if( blockBytes >= bytes - currXPos ){
             textX = ( currXPos / bytes ) * 100 + ( ( ( bytes - currXPos ) / bytes ) * 100 ) / 2 + "%";
@@ -79,17 +76,22 @@ function drawHeader( domElement, packet, headerDesc, bytes, blockHeight ){
                 blockBytes = 0;
             }
             //Draw block
-            svg.call(block.texture)
-            .append("rect")
+            svg.call(block.texture);
+            rect = svg.append("rect")
                 .attr("x",x + "%")
                 .attr("y",y + "px")
                 .attr("width",width + "%")
                 .attr("height",height + "px")
-                .attr("class","packetBlock")
-                .style("fill",block.texture.url());
+                .attr("class","packetBlock");
+            if( typeof(packet[block.field]) == "undefined" ){
+                rect.style("fill","black");
+            }else{
+                rect.style("fill",block.texture.url());
+            }
         }
         //Add background first so its behind text element
         textBackground = svg.append("rect");
+
         //Add text
         text = svg.append("text")
             .attr("x", textX )
@@ -97,16 +99,13 @@ function drawHeader( domElement, packet, headerDesc, bytes, blockHeight ){
             .attr("dy", ".35em")
             // .attr("style","z-index:40;")
             .style("text-anchor", "middle")
-            .attr("class","packetBlockText")
-            .text(block.name+": "+packet[block.field]);
-        text = text._groups[0][0].getBBox();
-        //Set text background attributes
-        textBackground.attr("x",text.x - textBackgroundPadding / 2 )
-        .attr("y",text.y - textBackgroundPadding / 2)
-        .attr("width",text.width + textBackgroundPadding)
-        .attr("height",text.height + textBackgroundPadding)
-        .style("fill",block.textBackground);
-
+            .attr("class","packetBlockText");
+                // console.log(typeof(packet[block.field]));
+        if( typeof(packet[block.field]) == "undefined" || typeof(packet[block.field]) == "boolean" ){
+            text.text(block.name);
+        }else{
+            text.text(block.name+": "+packet[block.field]);
+        }
     });
 }
 /**
@@ -140,10 +139,17 @@ function build( domElement, packet ){
     packetVisContainer.appendChild(tcpHeader);
     packetDataWrapper.appendChild(packetData);
     packetVisContainer.appendChild(packetDataWrapper);
-
+    //Draw ethernet header
     drawHeader( ethernetHeader, packet, packetHeaderDesc.ethernetHeader, bytes, blockHeight );
-    drawHeader( ipHeader, packet, packetHeaderDesc.ipHeader, bytes, blockHeight );
-    drawHeader( tcpHeader, packet, packetHeaderDesc.tcpHeader, bytes, blockHeight );
+    //If its an ip packet draw ip header
+    if( packet.etherType === 8 ){
+        drawHeader( ipHeader, packet, packetHeaderDesc.ipHeader, bytes, blockHeight );
+        //If its a tcp packet draw tcp header
+        if( packet.ipType === 6 ){
+            drawHeader( tcpHeader, packet, packetHeaderDesc.tcpHeader, bytes, blockHeight );
+        }
+    }
+
     packetData.innerHTML = hex.toAscii(packet.data);
     showBytes.onclick = function(){ packetData.innerHTML = hex.toBytes(packet.data); };
     showHex.onclick = function(){ packetData.innerHTML = packet.data.replace(/(.{2})/g,"$1 "); };

@@ -58,7 +58,7 @@ if( capture ){
             console.error("ERROR: ",error);
         }else{
             packets.forEach(function(packet){
-                if( network.getLocalDevice( packet, captureDevice, localDevices ) ){
+                if( packet.etherType === 8 && network.getLocalDevice( packet, captureDevice, localDevices ) ){
                     //Print data if verbose mode is selected
                     if( verbose ){
                         console.log( "New local devices found. Current device list:", localDevices );
