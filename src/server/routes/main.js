@@ -1,14 +1,16 @@
 const router = require("express").Router();
 const packetDatabase = require("../../database/packetDatabase");
+const network = require("../utils/network");
+const sessionDatabase = require("../../database/sessionDatabase");
 const path = require("path");
 const file = require("../utils/file");
 //Request for /database
 router.get("/",function(req,res){
-    res.status(200).sendFile(path.join(__dirname+'/../../public/database/database.html'));
+    res.redirect("/packets");
 });
 //Request for /database/packet?id=
 router.get("/packet",function(req,res){
-    res.status(200).sendFile(path.join(__dirname+'/../../public/database/packet.html'));
+    res.status(200).sendFile(path.join(__dirname+'/../../public/packet.html'));
 });
 //Request for /database/packet/json?id=
 router.get("/packet.json",function(req,res){
@@ -22,7 +24,7 @@ router.get("/packet.json",function(req,res){
 });
 //Request for /database/packets
 router.get("/packets",function(req,res){
-    res.status(200).sendFile(path.join(__dirname+'/../../public/database/packets.html'));
+    res.status(200).sendFile(path.join(__dirname+'/../../public/packets.html'));
 });
 //Request for /database/packets/json?num=
 router.get("/packets.json",function(req,res){
@@ -41,8 +43,8 @@ router.get("/packets.json",function(req,res){
         });
     }
 });
-//Request for /database/metadata.json
-router.get("/metadata.json",function(req,res){
+//Request for /database/database.json
+router.get("/database.json",function(req,res){
     packetDatabase.getNumPackets( function(error,count){
         if( error ){
             res.status(500).json({"error":error.message});
@@ -51,6 +53,20 @@ router.get("/metadata.json",function(req,res){
                 "packetDatabaseSize":file.getSize(path.join(__dirname+'/../../../databases/packets.db')),
                 "totalPackets":count
             });
+        }
+    });
+});
+
+router.get("/interfaces.json",function(req,res){
+    res.status(200).json(network.getInterfaces());
+});
+
+router.get("/session.json",function(req,res){
+    sessionDatabase.getSession( req.query.id, function(error,session){
+        if( error ){
+            res.status(500).json({"error":error.message});
+        }else{
+            res.status(200).json(session);
         }
     });
 });

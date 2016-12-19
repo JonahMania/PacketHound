@@ -8,7 +8,7 @@ const request = require("../utils/request");
 var params = url.getParams();
 var contentContainer = document.getElementById("contentContainer");
 
-request.getJSON( "/database/packet.json?id=" + params.id, function( error, packetData ){
+request.getJSON( "/packet.json?id=" + params.id, function( error, packetData ){
     if( error ){
         console.error(error);
     }else{

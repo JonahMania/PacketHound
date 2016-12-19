@@ -1,5 +1,4 @@
-const network = require("./network");
-const database = require("./database");
+const main = require("./main");
 /**
 * Sets all routes on a express app
 * @param {function} app The express app to set routes to
@@ -13,8 +12,7 @@ const setRoutes = function(app){
         throw "Error argument 1 of setRoutes must be a function";
     }
     //Set routes
-    app.use("/network", network);
-    app.use("/database", database);
+    app.use("/", main);
 
     //Set all remaining routes to return 404
     app.use("*", function(req, res){

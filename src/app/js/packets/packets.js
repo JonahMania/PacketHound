@@ -21,7 +21,7 @@ if( !params.count ){
 //Onclick event for when a packet is selected from the vis
 function onclick( packet ){
     //Navigate to packet vis of selected packet
-    window.location.href = "/database/packet?id="+packet._id;
+    window.location.href = "/packet?id="+packet._id;
 }
 
 packets.build( contentContainer, onclick, filters );

@@ -9,3 +9,15 @@ Install libpcap-dev
 * Arch - sudo pacman -Ss libpcap
 
 `$ npm install`
+
+
+## Usage
+
+### Routes
+* /packets.json
+* /packet.json?id=[id]
+* /session.json
+* /database.json
+* /interfaces.json
+* /packets
+* /packet?id=[id]

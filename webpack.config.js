@@ -4,11 +4,10 @@ const path = require("path");
 module.exports = {
     entry: {
         packet:'./src/app/js/packet/packet.js',
-        packets:'./src/app/js/packets/packets.js',
-        database:'./src/app/js/database/database.js'
+        packets:'./src/app/js/packets/packets.js'
     },
     output: {
-        path: 'src/public/database',
+        path: 'src/public',
         filename: '[name].bundle.js',
     },
     module: {

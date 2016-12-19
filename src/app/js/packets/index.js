@@ -95,7 +95,7 @@ function build( domElement, onclick, filters ){
     var packetsVisContainer = document.getElementById("packetsVisContainer");
 
     //Get requested packets
-    request.getJSON("/database/packets.json?count="+filters.count,function(error,packets){
+    request.getJSON("/packets.json?count="+filters.count,function(error,packets){
         if( error ){
             console.error(error);
         }else{
