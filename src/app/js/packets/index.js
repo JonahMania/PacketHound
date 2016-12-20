@@ -99,6 +99,33 @@ function drawPackets( domElement, packets, onclick ){
     //Give container the correct height
     container.attr("height",currY + blockHeight + padding.y + containerPadding);
 }
+
+/**
+* Draws a block of the key in a dom element
+* @param {object} domElement The element to draw the packet in
+* @param {string} type The type of the block to draw
+* @param {string} text The text to render for this block of the key
+*/
+function buildKeyBlock( domElement, type, text ){
+    var keyBlockWidth = 40;
+    var keyBlockHeight = 40;
+    //Create d3 key
+    var keyContainer = d3.select( domElement )
+    .append("div");
+
+    keyContainer.append("svg")
+    .attr("width",keyBlockWidth + 4)
+    .attr("height",keyBlockHeight + 4)
+    .call(packetTextures[type])
+    .append("rect")
+    .attr("width",keyBlockWidth)
+    .attr("height",keyBlockHeight)
+    .attr("x",2)
+    .attr("y",2)
+    .style("fill",packetTextures[type].url());
+    keyContainer.append("p")
+    .html(text);
+}
 /**
 * Builds the packetsVis content
 * @param {object} domElement The element to render new html in
@@ -112,6 +139,11 @@ function build( domElement, onclick, filters ){
     var packetsVisDates = document.getElementById("packetsVisDates");
     var packetsVisKey = document.getElementById("packetsVisKey");
     var packetsVisContainer = document.getElementById("packetsVisContainer");
+
+    //Build key
+    buildKeyBlock(packetsVisKey,"tcp","TCP packet");
+    buildKeyBlock(packetsVisKey,"udp","UDP packet");
+    buildKeyBlock(packetsVisKey,"other","other");
 
     //Get requested packets
     request.getJSON("/packets.json?count="+filters.count,function(error,packets){

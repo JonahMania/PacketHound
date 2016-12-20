@@ -4,6 +4,39 @@
 
 .databaseVisPacket {
     stroke:black;
-    stroke-width:2px;
+    stroke-width:1.5px;
     fill:white;
+    cursor: pointer; 
+    cursor: hand;
+}
+
+#packetsVisCount {
+    padding-left:8px;
+}
+
+#packetsVisDates {
+    padding-left:8px;
+}
+
+#packetsVisKey div {
+    display: inline-block;
+    padding:2px;
+    padding-left:8px;
+}
+#packetsVisKey div svg{
+    display: inline-block;
+}
+
+#packetsVisKey > div > svg > rect{
+    stroke:black;
+    stroke-width:1.5px;
+    fill:white;
+}
+
+#packetsVisKey div p{
+    display: inline-block;
+    padding-left: 4px;
+    line-height:43px;
+    float:right;
+    font-size: 16px;
 }
