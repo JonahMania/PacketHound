@@ -1,84 +1,103 @@
 const d3 = require("d3");
-const textures = require("textures");
 const request = require("../utils/request");
 //Add css styling
 require("!style!css!../../css/packets.css");
 const packetsTemplate = require("html-loader!../../html/packets/packetsTemplate.html");
 const time = require("../utils/time");
+const packetTextures = require("./packetTextures");
 
 /**
-* Draws a single packet block in a dom element
+* Draws packets in a dom element
 * @param {object} domElement The element to draw the packet in
-* @param {object} packet The packet to draw
+* @param {object} packets The packets to draw
 * @param {object} onclick onclick event for the packet
 */
-function drawPacket( domElement, packet, onclick ){
+function drawPackets( domElement, packets, onclick ){
 
-    var blockWidth = packet.size / 3;
+    var padding = {
+        y:6,
+        x:4
+    };
+    var containerPadding = 6;
     var blockHeight = 40;
-    var padding = 2;
-    var t;
+    var maxBlockWidth = domElement.offsetWidth - ( padding.x * 2 ) - ( containerPadding * 2 );
+    var container;
+    var currX = padding.x + containerPadding;
+    var currY = padding.y + containerPadding;
+    var currWidth = 0;
+    var zoomFactor = 16;
 
-    if( packet.ipType === 6 ){
-        //TCP
-        t = textures
-            .lines()
-            .lighter()
-            .thicker()
-            .stroke("orange");
-    }else if( packet.ipType === 17 ){
-        //UDP
-        t = textures
-            .paths()
-            .d("crosses")
-            .lighter()
-            .thicker()
-            .stroke("blue");
-    }else{
-        //Other
-        t = textures
-            .circles()
-            .size(5)
-            .stroke("black");
-    }
+    //Set scale for block width
+    var widthScale = d3.scaleLinear()
+        .domain([0,Math.max.apply(Math,packets.map(function(p){
+            return p.size;
+        }))])
+        .range([0,maxBlockWidth]);
+    //Append container svg
+    container = d3.select(domElement)
+    .append("svg")
+    .attr("width",maxBlockWidth);
 
-    d3.select(domElement)
-        .append("svg")
-        .attr("width",blockWidth)
-        .attr("height",blockHeight)
-        .attr("class","databaseVisPacketContainer")
+    packets.forEach(function(packet){
+
+        var t;
+        //Set the correct texture for this packet type
+        switch( packet.ipType ){
+                case 6:
+                    t = packetTextures.tcp;
+                    break;
+                case 17:
+                    t = packetTextures.udp;
+                    break;
+                default:
+                    t =packetTextures.other;
+                    break;
+        }
+        //Scale the current packet by its size
+        currWidth = widthScale(packet.size);
+        //If we have overflowed passed the container bounds move to next line
+        if( currX + currWidth > maxBlockWidth ){
+            currX = padding.x + containerPadding;
+            currY += blockHeight + padding.y;
+        }
+        //Add rect for new packet
+        container
         .call(t)
         .append("rect")
-        .attr("x",padding)
-        .attr("y",padding)
-        .attr("width",blockWidth-padding*2)
-        .attr("height",blockHeight-padding*2)
-        .on("click",function(){
-            onclick(packet);
-        })
-        .on("mouseover",function(){
-            // d3.select(this.parentNode)
-            // .attr("width",blockWidth+10)
-            // .attr("height",blockHeight+10);
-            // // .style("position");
-            // d3.select(this)
-            // .attr("x",0)
-            // .attr("y",0)
-            // .attr("width",blockWidth+10)
-            // .attr("height",blockHeight+10);
-        })
-        .on("mouseout",function(){
-            // d3.select(this.parentNode)
-            // .attr("width",blockWidth)
-            // .attr("height",blockHeight);
-            // d3.select(this)
-            // .attr("x",padding)
-            // .attr("y",padding)
-            // .attr("width",blockWidth-padding*2)
-            // .attr("height",blockHeight-padding*2);
-        })
+        .attr("width",currWidth)
+        .attr("height",blockHeight)
+        .attr("x",currX)
+        .attr("y",currY)
         .attr("class","databaseVisPacket")
+        .on("mouseover",function(){
+            //Remove all other zoomed packets
+            d3.selectAll(".ZOOMED")
+            .remove();
+            //Add new rect on hover
+            container.append("rect")
+            .attr("width",this.getBBox().width + zoomFactor)
+            .attr("height",this.getBBox().height + zoomFactor)
+            .attr("x",this.getBBox().x - (zoomFactor / 2))
+            .attr("y",this.getBBox().y - (zoomFactor / 2))
+            //When focus is lost remove hover
+            .on("mouseout",function(){
+                d3.selectAll(".ZOOMED")
+                .remove();
+            })
+            //On select go to packet page
+            .on("click",function(){
+                onclick(packet);
+            })
+            .attr("class","databaseVisPacket ZOOMED")
+            .style("fill",t.url());
+        })
         .style("fill",t.url());
+
+        currX += currWidth + padding.x;
+    });
+
+    //Give container the correct height
+    container.attr("height",currY + blockHeight + padding.y + containerPadding);
 }
 /**
 * Builds the packetsVis content
@@ -103,9 +122,10 @@ function build( domElement, onclick, filters ){
             packetsVisCount.innerHTML = packets.length+" packets";
             //Set date range of packets
             packetsVisDates.innerHTML = time.timestampToDate(packets[packets.length-1].timestamp)+" to "+time.timestampToDate(packets[0].timestamp);
-            packets.forEach(function(packet){
-                drawPacket(packetsVisContainer, packet, onclick);
-            });
+            // packets.forEach(function(packet){
+            //     drawPacket(packetsVisContainer, packet, onclick);
+            // });
+            drawPackets(packetsVisContainer, packets, onclick);
         }
     });
 }
